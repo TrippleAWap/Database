@@ -59,13 +59,7 @@ export class Database {
      * @summary Use of this method is not recommended as it may not correctly save the database data.
      */
     save() {
-        if (this.saveMode === "scoreboard") {
-            world.scoreboard.removeObjective(this.databaseName);
-            world.scoreboard.addObjective(this.databaseName, JSON.stringify(this.data));
-        } else if (this.saveMode === "entity") {
-            const newTag = `{${this.databaseName.toString()}:${JSON.stringify(this.data)}}`;
-            this.entity.removeTag(entity.getTags().find(tag => tag.startsWith(this.databaseName)));
-            this.entity.addTag(newTag);
-        }
+         world.scoreboard.removeObjective(this.databaseName);
+         world.scoreboard.addObjective(this.databaseName, JSON.stringify(this.data));
     }
 }
