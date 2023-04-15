@@ -2,8 +2,6 @@ import { world } from "@minecraft/server";
 export class Database {
     /**
      * @param {string} databaseName - The name of the database.
-     * @param {string} [saveMode="scoreboard"] - The save mode of the database (scoreboard, entities).
-     * @param {Object<{typeId: string, name: string}>} [entityData={typeId: null, name: null}] - The entity name and type id used if save mode is entities.
      * @param {object} [creationData={}] - The sub-databases needed upon creation (can be undefined if undefined add them later using the set | add method).
      */
     constructor(databaseName, creationData = {}) {
