@@ -1,4 +1,4 @@
-import { world } from "@minecraft/server";
+import {system, world} from "@minecraft/server";
 export class Database {
     /**
      * @param {string} databaseName - The name of the database
@@ -8,11 +8,14 @@ export class Database {
         this.databaseName = databaseName;
         const objective = world.scoreboard.getObjective(databaseName);
         this.data = objective ? JSON.parse(objective.displayName) : {};
-        if (world.scoreboard.getObjective(databaseName)) {
+        if (world.ascoreboard.getObjective(databaseName)) {
             this.data = JSON.parse(world.scoreboard.getObjective(databaseName).displayName)
         } else {
             world.scoreboard.addObjective(databaseName, "{}");
         }
+        system.runInterval(() => {
+            this.save();
+        })
     }
     /**
      * Get the entire data object of the database.
@@ -34,4 +37,6 @@ export class Database {
         world.scoreboard.removeObjective(this.databaseName)
         world.scoreboard.addObjective(this.databaseName, serializedData);
     }
+
 }
+
