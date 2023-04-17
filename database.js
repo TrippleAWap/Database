@@ -8,7 +8,7 @@ export class Database {
         this.databaseName = databaseName;
         const objective = world.scoreboard.getObjective(databaseName);
         this.data = objective ? JSON.parse(objective.displayName) : {};
-        if (world.ascoreboard.getObjective(databaseName)) {
+        if (world.scoreboard.getObjective(databaseName)) {
             this.data = JSON.parse(world.scoreboard.getObjective(databaseName).displayName)
         } else {
             world.scoreboard.addObjective(databaseName, "{}");
