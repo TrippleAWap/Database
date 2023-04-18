@@ -1,42 +1,56 @@
-import {system, world} from "@minecraft/server";
+import { world, system } from "@minecraft/server"
+
 export class Database {
     /**
      * @param {string} databaseName - The name of the database
      */
-    constructor(databaseName)
-    {
+    constructor(databaseName) {
         this.databaseName = databaseName;
-        const objective = world.scoreboard.getObjective(databaseName);
-        this.data = objective ? JSON.parse(objective.displayName) : {};
-        if (world.scoreboard.getObjective(databaseName)) {
-            this.data = JSON.parse(world.scoreboard.getObjective(databaseName).displayName)
-        } else {
-            world.scoreboard.addObjective(databaseName, "{}");
-        }
-        system.runInterval(() => {
-            this.save();
-        })
+        /**@private */
+        this.objective = world.scoreboard.getObjective(databaseName) ?? world.scoreboard.addObjective(databaseName, "{}");
+        /**@private */
+        this.data = this.objective ? JSON.parse(this.objective.displayName) : {}
+        /**@private */
+        this.modified = false;
+        /**@private */
+        this.proxy = new Proxy(this.data, {
+            get: (target, key) => {
+                return target[key];
+            },
+            set: (target, key, value) => {
+                target[key] = value;
+                if (!this.modified) (this.modified = true) && system.run(() => { this.save(); this.modified = false; });
+                return true;
+            },
+            deleteProperty: (target, key) => {
+                delete target[key];
+                if (!this.modified) (this.modified = true) && system.run(() => { this.save(); this.modified = false; });
+                return true;
+            },
+            has: (target, key) => {
+                return key in target;
+            },
+            ownKeys: (target) => {
+                return Reflect.ownKeys(target);
+            }
+        });
     }
+
     /**
      * Get the entire data object of the database.
      * @returns {object} The data object of the database.
      */
     get all() {
-        return this.data;
+        return this.proxy;
     }
 
     /**
      * Saves the database. This method is deprecated and not meant to be used.
-     * @access private
+     * @private
      * @summary Use of this method is not recommended as it may not correctly save the database data.
      */
     save() {
-        const scoreboard = world.scoreboard.getObjective(this.databaseName);
-        const serializedData = JSON.stringify(this.data);
-        if (scoreboard.displayName === serializedData) return;
-        world.scoreboard.removeObjective(this.databaseName)
-        world.scoreboard.addObjective(this.databaseName, serializedData);
+        try { world.scoreboard.removeObjective(this.databaseName); } catch { };
+        world.scoreboard.addObjective(this.databaseName, JSON.stringify(this.data));
     }
-
 }
-
