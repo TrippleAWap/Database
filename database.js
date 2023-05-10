@@ -1,4 +1,4 @@
-import {world, system, ScoreboardIdentity, Vector} from "@minecraft/server";
+import {world, system} from "@minecraft/server";
 
 const overworld = world.getDimension("overworld");
 export class Database {
