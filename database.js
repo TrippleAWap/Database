@@ -1,4 +1,4 @@
-import { world, system, ScoreboardIdentity } from "@minecraft/server";
+import {world, system, ScoreboardIdentity, Vector} from "@minecraft/server";
 
 const overworld = world.getDimension("overworld");
 export class Database {
@@ -6,48 +6,58 @@ export class Database {
      * @param {string} databaseName - The name of the database
      */
     constructor(databaseName) {
-        this.databaseName = databaseName;
-        /**@private */
-        this.objective = world.scoreboard.getObjective(databaseName) ?? world.scoreboard.addObjective(databaseName, databaseName);
-        this.modified = false;
-        /**@private */
-        this.data = this.objective.getParticipants().length > 0 ? Object.fromEntries(this.objective.getParticipants().map((x) => [x.displayName.split(":")[0], JSON.parse(x.displayName.split(":")[1].replace(/\\"/g, '"'))])) : {};
-        /**@private */
-        this.createProxy = (target) => {
-            return new Proxy(target, {
-                get: (target, key) => {
-                    if (Array.isArray(target[key])) {
-                        // If the property is an array, wrap it with a Proxy
-                        return this.createProxy(target[key]);
-                    } else {
-                        return target[key];
-                    }},
-                set: (target, key, value) => {
-                    target[key] = value;
-                    if (!this.modified)
-                        (this.modified = true) &&
-                        system.run(() => {
-                            this.save();
-                            this.modified = false;
-                        });
-                    return true;},
-                deleteProperty: (target, key) => {
-                    delete target[key];
-                    if (!this.modified)
-                        (this.modified = true) &&
-                        system.run(() => {
-                            this.save();
-                            this.modified = false;
-                        });
-                    return true;},
-                has: (target, key) => {
-                    return key in target;},
-                ownKeys: (target) => {
-                    return Reflect.ownKeys(target);},
-            });
-        }
-        /**@private */
-        this.proxy = this.createProxy(this.data);
+        try {
+            this.databaseName = databaseName;
+            /**@private */
+            this.objective = world.scoreboard.getObjective(databaseName) ?? world.scoreboard.addObjective(databaseName, databaseName);
+            this.modified = false;
+            /**@private */
+            this.data = this.objective.getParticipants().length > 0 ? Object.fromEntries(this.objective.getParticipants().map(x => {
+                const [key, value] = x.displayName.split(":");
+                return [key, JSON.parse(value)];
+                })) : {};
+            /**@private */
+            this.createProxy = (target) => {
+                return new Proxy(target, {
+                    get: (target, key) => {
+                        if (Array.isArray(target[key])) {
+                            // If the property is an array, wrap it with a Proxy
+                            return this.createProxy(target[key]);
+                        } else {
+                            return target[key];
+                        }
+                    },
+                    set: (target, key, value) => {
+                        target[key] = value;
+                        if (!this.modified)
+                            (this.modified = true) &&
+                            system.run(() => {
+                                this.save();
+                                this.modified = false;
+                            });
+                        return true;
+                    },
+                    deleteProperty: (target, key) => {
+                        delete target[key];
+                        if (!this.modified)
+                            (this.modified = true) &&
+                            system.run(() => {
+                                this.save();
+                                this.modified = false;
+                            });
+                        return true;
+                    },
+                    has: (target, key) => {
+                        return key in target;
+                    },
+                    ownKeys: (target) => {
+                        return Reflect.ownKeys(target);
+                    },
+                });
+            }
+            /**@private */
+            this.proxy = this.createProxy(this.data);
+        } catch {}
     }
 
     /**
