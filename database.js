@@ -11,7 +11,7 @@ export class Database {
         /**@private */
         this.objective = world.scoreboard.getObjective(databaseName) ?? world.scoreboard.addObjective(databaseName, "{}");
         /**@private */
-        this.data = this.objective.getParticipants().length? JSON.parse(`{${this.objective.getParticipants().map((e) => e.displayName.replace(/\\"/g, '"')).join(",")}}`) : {};
+        this.data = JSON.parse(`{${this.objective.getParticipants().map((e) => e.displayName.replace(/\\"/g, '"')).join(",")}}`)
         /**@private */
         this.modified = false;
         /**@private */
