@@ -9,7 +9,7 @@ export class Database {
     constructor(databaseName) {
         this.databaseName = databaseName;
         /**@private */
-        this.objective = world.scoreboard.getObjective(databaseName) ?? world.scoreboard.addObjective(databaseName, "{}");
+        this.objective = world.scoreboard.getObjective(databaseName) ?? world.scoreboard.addObjective(databaseName, databaseName);
         /**@private */
         this.data = JSON.parse(`{${this.objective.getParticipants().map((e) => e.displayName.replace(/\\"/g, '"')).join(",")}}`)
         /**@private */
