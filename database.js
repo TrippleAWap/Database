@@ -50,6 +50,7 @@ export class Database {
         }
         /**@private */
         this.proxy = this.createProxy(this.data);
+        return this.proxy;
     }
 
     /**
