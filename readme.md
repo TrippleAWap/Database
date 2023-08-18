@@ -12,7 +12,7 @@ system.runInterval(async () => {
 	}
 })
 ```
-This is a simple auction house using scoreboards for MCBE created by TrippleAWap!
+This is a simple database using scoreboards for MCBE created by TrippleAWap!
 
 # MCBE+ DISCORD
 This is my personal discord I've made with a friend, if you're a developer or a realm owner consider joining 🙂
