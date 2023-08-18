@@ -18,12 +18,13 @@ export class Database {
         this.createProxy = (target) => {
             return new Proxy(target, {
                 get: (target, key) => {
-                    if (Array.isArray(target[key])) {
-                        // If the property is an array, wrap it with a Proxy
-                        return this.createProxy(target[key]);
+                    let value = target[key];
+                    if (typeof value === 'object' && value !== null) {
+                        return this.createProxy(value);
                     } else {
-                        return target[key];
-                    }},
+                        return value;
+                    }
+                },
                 set: (target, key, value) => {
                     target[key] = value;
                     if (!this.modified)
@@ -32,7 +33,8 @@ export class Database {
                             this.save();
                             this.modified = false;
                         });
-                    return true;},
+                    return true;
+                },
                 deleteProperty: (target, key) => {
                     delete target[key];
                     if (!this.modified)
@@ -41,30 +43,22 @@ export class Database {
                             this.save();
                             this.modified = false;
                         });
-                    return true;},
+                    return true;
+                },
                 has: (target, key) => {
-                    return key in target;},
+                    return key in target;
+                },
                 ownKeys: (target) => {
-                    return Reflect.ownKeys(target);},
+                    return Reflect.ownKeys(target);
+                }
             });
         }
-        /**@private */
-        this.proxy = this.createProxy(this.data);
-        return this.proxy;
+        return this.createProxy(this.data)
     }
 
     /**
-     * Get the entire data object of the database.
-     * @returns {object} The data object of the database.
-     */
-    get all() {
-        return this.proxy;
-    }
-
-    /**
-     * Saves the database. This method is deprecated and not meant to be used.
      * @private
-     * @summary Use of this method is not recommended as it may not correctly save the database data.
+     * @summary Use of this method is not recommended as the proxy will automatically save the database when it is modified.
      */
     save() {
         try { world.scoreboard.removeObjective(this.databaseName); } catch { };
