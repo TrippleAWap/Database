@@ -1,6 +1,6 @@
 # Example Usage
 ```js
-import {world, system } from "@minecraft/server";
+import { world, system } from "@minecraft/server";
 
 import { Database } from "./dynamics";
 const dB = new Database("name_here")
