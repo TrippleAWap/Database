@@ -2,7 +2,7 @@
 ```js
 import { world, system } from "@minecraft/server";
 
-import { Database } from "./dynamics";
+import { Database } from "./database";
 const dB = new Database("name_here")
 system.runInterval(async () => {
 	for (const player of world.getAllPlayers()) {
