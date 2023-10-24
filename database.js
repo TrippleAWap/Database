@@ -1,4 +1,4 @@
-import {system, world} from "@minecraft/server";
+import {world} from "@minecraft/server";
 
 console.warn(`\n§7[§cDatabase§7] §rSuccessfully loaded!\n§7Register Properties: §a${world.getDynamicPropertyIds().map((id) => JSON.stringify(id)).join(", ")}\n§7Total Bytes: §a${world.getDynamicPropertyTotalByteCount()}`);
 
@@ -73,7 +73,7 @@ const playerStats = {
     }
 }
 // This is an example usage.
-// const statsDB = new Database("zenithian:sdsdsdsd", {});
+// const statsDB = new Database("stats", {});
 // system.runInterval(() => {
 //     const players = world.getAllPlayers();
 //     for (const player of players) {
