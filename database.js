@@ -1,6 +1,6 @@
-import { world, system } from "@minecraft/server";
+import {system, world} from "@minecraft/server";
 
-const overworld = world.getDimension("overworld");
+console.warn(`\n§7[§cDatabase§7] §rSuccessfully loaded!\n§7Register Properties: §a${world.getDynamicPropertyIds().map((id) => JSON.stringify(id)).join(", ")}\n§7Total Bytes: §a${world.getDynamicPropertyTotalByteCount()}`);
 
 export class Database {
     /**
@@ -9,9 +9,7 @@ export class Database {
     constructor(databaseName) {
         this.databaseName = databaseName;
         /**@private */
-        this.objective = world.scoreboard.getObjective(databaseName) ?? world.scoreboard.addObjective(databaseName, databaseName);
-        /**@private */
-        this.data = JSON.parse(`{${this.objective.getParticipants().map((e) => e.displayName.replace(/\\"/g, '"')).join(",")}}`)
+        this.data = JSON.parse(world.getDynamicProperty(databaseName) ?? "{}")
         /**@private */
         this.modified = false;
         /**@private */
@@ -27,22 +25,12 @@ export class Database {
                 },
                 set: (target, key, value) => {
                     target[key] = value;
-                    if (!this.modified)
-                        (this.modified = true) &&
-                        system.run(() => {
-                            this.save();
-                            this.modified = false;
-                        });
+                    this.save;
                     return true;
                 },
                 deleteProperty: (target, key) => {
                     delete target[key];
-                    if (!this.modified)
-                        (this.modified = true) &&
-                        system.run(() => {
-                            this.save();
-                            this.modified = false;
-                        });
+                    this.save;
                     return true;
                 },
                 has: (target, key) => {
@@ -56,15 +44,44 @@ export class Database {
         return this.createProxy(this.data)
     }
 
+
     /**
      * @private
      * @summary Use of this method is not recommended as the proxy will automatically save the database when it is modified.
      */
-    save() {
-        try { world.scoreboard.removeObjective(this.databaseName); } catch { };
-        world.scoreboard.addObjective(this.databaseName, this.databaseName);
-        for (const key in this.data) {
-            overworld.runCommandAsync(`scoreboard players set "\\"${key}\\":${JSON.stringify(this.data[key]).replace(/"/g, '\\"')}" ${this.databaseName} 0`);
+    get save() {
+        world.setDynamicProperty(this.databaseName, JSON.stringify(this.data));
+        return true;
+    }
+}
+
+const playerStats = {
+    name: "",
+    money: 0,
+    level: 0,
+    exp: 0,
+    kills: 0,
+    deaths: 0,
+    playtime: 0,
+    lastActive: 0,
+    vault: {
+        vaultID: -1,
+        sharedVault: {
+            vaultID: -1,
+            rank: "Member"
         }
     }
 }
+// This is an example usage.
+// const statsDB = new Database("zenithian:sdsdsdsd", {});
+// system.runInterval(() => {
+//     const players = world.getAllPlayers();
+//     for (const player of players) {
+//         /** @type {typeof playerStats} */
+//         const stats = statsDB[player.id] ??= playerStats;
+//         stats.lastActive = Date.now()
+//         stats.playtime += 1000 / 20
+//         stats.name = player.name
+//     }
+//     console.warn(statsDB)
+// })
