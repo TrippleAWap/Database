@@ -1,6 +1,6 @@
 import {world} from "@minecraft/server";
 
-console.warn(`\n§7[§cDatabase§7] §rSuccessfully loaded!\n§7Register Properties: §a${world.getDynamicPropertyIds().map((id) => JSON.stringify(id)).join(", ")}\n§7Total Bytes: §a${world.getDynamicPropertyTotalByteCount()}`);
+console.warn(`\n§7[§cDatabase§7] §rSuccessfully loaded!\n§7Registered Properties Count: ${world.getDynamicPropertyIds().length}\n§7Registered Properties: §a${world.getDynamicPropertyIds().map(i => JSON.stringify(i)).join(", ")}\n§7Total Bytes: §a${world.getDynamicPropertyTotalByteCount()}`);
 
 export class Database {
     /**
