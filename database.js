@@ -7,9 +7,8 @@ export class Database {
      * @param {string} databaseName - The name of the database
      */
     constructor(databaseName) {
-        this.databaseName = databaseName;
         /**@private */
-        this.modified = false;
+        this.databaseName = databaseName;
         /**@private */
         const getDataFromSpreadDynamics = () => {
             let str = ''
@@ -22,6 +21,7 @@ export class Database {
         }
         /**@private */
         this.data = getDataFromSpreadDynamics();
+        /**@private */
         this.createProxy = (target) => {
             return new Proxy(target, {
                 get: (target, key) => {
