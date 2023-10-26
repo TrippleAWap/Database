@@ -71,25 +71,25 @@ export class Database {
         return true;
     }
 }
-
-const playerStats = {
-    name: "",
-    money: 0,
-    level: 0,
-    exp: 0,
-    kills: 0,
-    deaths: 0,
-    playtime: 0,
-    lastActive: 0,
-    vault: {
-        vaultID: -1,
-        sharedVault: {
-            vaultID: -1,
-            rank: "Member"
-        }
-    }
-}
 // This is an example usage.
+
+// const playerStats = {
+//     name: "",
+//     money: 0,
+//     level: 0,
+//     exp: 0,
+//     kills: 0,
+//     deaths: 0,
+//     playtime: 0,
+//     lastActive: 0,
+//     vault: {
+//         vaultID: -1,
+//         sharedVault: {
+//             vaultID: -1,
+//             rank: "Member"
+//         }
+//     }
+// }
 // const statsDB = new Database("stats");
 // system.runInterval(() => {
 //     const players = world.getAllPlayers();
