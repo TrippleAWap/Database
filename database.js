@@ -9,10 +9,19 @@ export class Database {
     constructor(databaseName) {
         this.databaseName = databaseName;
         /**@private */
-        this.data = JSON.parse(world.getDynamicProperty(databaseName) ?? "{}")
-        /**@private */
         this.modified = false;
         /**@private */
+        const getDataFromSpreadDynamics = () => {
+            let str = ''
+            const dynamics = world.getDynamicPropertyIds().filter((id) => id.startsWith(`${this.databaseName}:`))
+            for (const id of dynamics) {
+                const value = world.getDynamicProperty(id) ?? {}
+                str += value;
+            }
+            return str.length > 0 ? JSON.parse(str) : {};
+        }
+        /**@private */
+        this.data = getDataFromSpreadDynamics();
         this.createProxy = (target) => {
             return new Proxy(target, {
                 get: (target, key) => {
@@ -50,7 +59,15 @@ export class Database {
      * @summary Use of this method is not recommended as the proxy will automatically save the database when it is modified.
      */
     get save() {
-        world.setDynamicProperty(this.databaseName, JSON.stringify(this.data));
+        const createSpreadDynamic = (obj) => {
+            const stringObj = JSON.stringify(obj)
+            const charCount = stringObj.length
+            for (let i = 0; i < charCount; i += 32767) {
+                const value = stringObj.slice(i, (i + 32767) > charCount ? charCount : i + 32767)
+                world.setDynamicProperty(`${this.databaseName}:${i}`, value)
+            }
+        }
+        createSpreadDynamic(this.data)
         return true;
     }
 }
