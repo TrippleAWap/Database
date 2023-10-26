@@ -90,7 +90,7 @@ const playerStats = {
     }
 }
 // This is an example usage.
-// const statsDB = new Database("stats", {});
+// const statsDB = new Database("stats");
 // system.runInterval(() => {
 //     const players = world.getAllPlayers();
 //     for (const player of players) {
