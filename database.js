@@ -1,6 +1,6 @@
 import {world} from "@minecraft/server";
 
-console.warn(`\n§7[§cDatabase§7] §rSuccessfully loaded!\n§7Registered Properties Count: ${world.getDynamicPropertyIds().length}\n§7Registered Properties: §a${world.getDynamicPropertyIds().map(i => JSON.stringify(i)).join(", ")}\n§7Total Bytes: §a${world.getDynamicPropertyTotalByteCount()}`);
+console.warn(`\n§7[§cDatabase§7] §rSuccessfully loaded!\n§7Registered Properties Count: ${world.getDynamicPropertyIds().length}\n§7Registered Properties: §a${world.getDynamicPropertyIds().map((i, index, map) => { map.filter(d => d.split(":").slice(0, -1).join(":") !== i); return JSON.stringify(i.split(":").slice(0, -1).join(":"))}).join(", ")}\n§7Total Bytes: §a${world.getDynamicPropertyTotalByteCount()}`);
 
 export class Database {
     /**
@@ -9,7 +9,6 @@ export class Database {
     constructor(databaseName) {
         /**@private */
         this.databaseName = databaseName;
-        /**@private */
         const getDataFromSpreadDynamics = () => {
             let str = ''
             const dynamics = world.getDynamicPropertyIds().filter((id) => id.startsWith(`${this.databaseName}:`))
@@ -21,7 +20,6 @@ export class Database {
         }
         /**@private */
         this.data = getDataFromSpreadDynamics();
-        /**@private */
         this.createProxy = (target) => {
             return new Proxy(target, {
                 get: (target, key) => {
@@ -50,6 +48,8 @@ export class Database {
                 }
             });
         }
+        const proxy = this.createProxy(this.data)
+        proxy.delete = this.delete.bind(this)
         return this.createProxy(this.data)
     }
 
@@ -71,22 +71,28 @@ export class Database {
         return true;
     }
 
-    get delete() {
+    delete() {
         try {
-            const dynamics = world.getDynamicPropertyIds().filter((id) => id.startsWith(`${this.databaseName}:`))
+            const dynamics =  world.getDynamicPropertyIds().filter((id) => !id.startsWith(`${this.databaseName}:`))
+            const data = {}
             for (const id of dynamics) {
-                world.setDynamicProperty(id, undefined)
+                if (dynamics.includes(id)) continue;
+                data[id] = world.getDynamicProperty(id) ?? {};
             }
-            console.warn(`§7[§cDatabase§7] §rDeleting database ${this.databaseName}...`)
+            world.clearDynamicProperties()
+            for (const id of dynamics) {
+                world.setDynamicProperty(id, data[id])
+            }
+            console.warn(`§7[§cDatabase§7] §rDeleted database "${this.databaseName}"...`)
             this.data = {};
             return true;
         } catch (error) {
-            console.warn(`§7[§cDatabase§7] §rFailed to delete database ${this.databaseName}!`)
+            console.warn(`§7[§cDatabase§7] §rFailed to delete database "${this.databaseName}"!`)
             return false;
         }
-
     }
 }
+
 // This is an example usage.
 
 // const playerStats = {
