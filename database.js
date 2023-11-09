@@ -70,7 +70,19 @@ export class Database {
         createSpreadDynamic(this.data)
         return true;
     }
+
+    get delete() {
+        try {
+            world.setDynamicProperty(`${this.databaseName}`, null)
+            return true;
+        } catch (error) {
+            console.warn(`§7[§cDatabase§7] §rFailed to delete database ${this.databaseName}!`)
+            return false;
+        }
+
+    }
 }
+
 // This is an example usage.
 
 // const playerStats = {
