@@ -73,7 +73,12 @@ export class Database {
 
     get delete() {
         try {
-            world.setDynamicProperty(`${this.databaseName}`, null)
+            const dynamics = world.getDynamicPropertyIds().filter((id) => id.startsWith(`${this.databaseName}:`))
+            for (const id of dynamics) {
+                world.setDynamicProperty(id, undefined)
+            }
+            console.warn(`§7[§cDatabase§7] §rDeleting database ${this.databaseName}...`)
+            this.data = {};
             return true;
         } catch (error) {
             console.warn(`§7[§cDatabase§7] §rFailed to delete database ${this.databaseName}!`)
@@ -82,7 +87,6 @@ export class Database {
 
     }
 }
-
 // This is an example usage.
 
 // const playerStats = {
