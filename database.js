@@ -24,6 +24,7 @@ export class Database {
             return new Proxy(target, {
                 get: (target, key) => {
                     let value = target[key];
+                    if (target === "_o_parent") return this;
                     if (typeof value === 'object' && value !== null) {
                         return this.createProxy(value);
                     } else {
@@ -49,7 +50,6 @@ export class Database {
             });
         }
         const proxy = this.createProxy(this.data)
-        proxy.delete = this.delete.bind(this)
         return this.createProxy(this.data)
     }
 
