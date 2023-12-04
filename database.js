@@ -49,7 +49,6 @@ export class Database {
                 }
             });
         }
-        const proxy = this.createProxy(this.data)
         return this.createProxy(this.data)
     }
 
