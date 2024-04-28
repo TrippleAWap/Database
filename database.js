@@ -2,7 +2,7 @@ import { world } from "@minecraft/server";
 
 console.warn(`\n§7[§cDatabase§7] §rSuccessfully loaded!\n§7Registered Properties Count: ${world.getDynamicPropertyIds().length}\n§7Registered Properties: §a${world.getDynamicPropertyIds().map((i, index, map) => { map.filter(d => d.split(":").slice(0, -1).join(":") !== i); return JSON.stringify(i.split(":").slice(0, -1).join(":")) }).join(", ")}\n§7Total Bytes: §a${world.getDynamicPropertyTotalByteCount()}`);
 
-export default class Database {
+export class Database {
     /**
      * @param {string} databaseName - The name of the database
      */
