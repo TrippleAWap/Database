@@ -28,9 +28,8 @@ export class Database {
                     if (key === "_o_parent") return classRef;
                     if (typeof value === 'object' && value !== null) {
                         return this.createProxy(value);
-                    } else {
-                        return value;
                     }
+                    return value;
                 },
                 set: (target, key, value) => {
                     target[key] = value;
